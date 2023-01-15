@@ -1,0 +1,228 @@
+<html>
+    <head>
+        <style>
+            input, button { padding: 10px; }
+        </style>
+    </head>
+    <body>
+        <input type="text" id="message" autocomplete="off" />
+        <button onclick="transmitMessage()">Send</button>
+       
+    <style>
+      /* CSS for card styling */
+      .card {
+        width: 150px;
+        height: 200px;
+        background-color: white;
+        border: 1px solid black;
+        margin: 10px;
+        padding: 10px;
+        float: left;
+      }
+      .card img {
+        width: 100%;
+      }
+      .card-row {
+  display: flex;
+}
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.card-row {
+  display: flex;
+}
+
+.card {
+  width: 150px;
+  height: 200px;
+  margin: 10px;
+  border: 1px solid black;
+}
+
+.top {
+  opacity: 1;
+}
+
+.bottom {
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.bottom.flip {
+  opacity: 1;
+}
+/* Style the modal container */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* Style the modal content */
+.modal-content {
+  position: relative;
+  background-color: #fefefe;
+  margin: auto;
+  padding: 0;
+  width: 80%;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  -webkit-animation-name: animatetop;
+  -webkit-animation-duration: 0.4s;
+  animation-name: animatetop;
+  animation-duration: 0.4s;
+}
+
+/* Style the close button */
+.close-modal {
+  color: white;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+  color: #000;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Add animation */
+@-webkit-keyframes animatetop {
+  from {
+    top: -300px;
+    opacity: 0;
+  }
+  to {
+    top: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes animatetop {
+  from {
+    top: -300px;
+    opacity: 0;
+  }
+  to {
+    top: 0;
+    opacity: 1;
+  }
+}
+
+    </style>
+  </head>
+  <body>
+    <div class="card-container">
+        <div id="card-modal" class="modal">
+            <div class="modal-content">
+              <span class="close-modal">&times;</span>
+              <img id="modal-img" src="" alt="Selected card">
+            </div>
+          </div>
+          
+    <script>
+      var socket = new WebSocket('ws://localhost:8080');
+      var gameContainer = document.getElementById("game-container");
+      let playerCards=[];
+
+      const cardDeck = [
+  { id: 1, imgSrc: 'img/god1.png', name: 'Zeus', power: 10, defense: 8,  element: 'raio',  classe: 'mago' },
+  { id: 2, imgSrc: 'img/god2.png', name: 'Apollo', power: 8, defense: 9,  element: 'fogo',  classe: 'mago' },
+  { id: 3, imgSrc: 'img/god3.png', name: 'Hades', power: 9, defense: 7,  element: 'larva',  classe: 'mago' },
+  { id: 4, imgSrc: 'img/god4.png', name: 'Poseidon', power: 7, defense: 8,  element: 'agua',  classe: 'mago' },
+  { id: 5, imgSrc: 'img/god5.png', name: 'Ra', power: 8, defense: 6,  element: 'fogo',  classe: 'mago' },
+  { id: 6, imgSrc: 'img/god6.png', name: 'Shiva', power: 6, defense: 9,  element: 'terra',  classe: 'mago' },
+  { id: 7, imgSrc: 'img/god7.png', name: 'Thor', power: 9, defense: 8,  element: 'raio',  classe: 'mago' },
+  { id: 8, imgSrc: 'img/god8.png', name: 'Odin', power: 7, defense: 7,  element: 'fogo',  classe: 'mago' },
+];
+
+function shuffleDeck(deck) {
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+  return deck;
+}
+
+function dealCards(numCards) {
+  const shuffledDeck = shuffleDeck(cardDeck);
+  return shuffledDeck.slice(0, numCards);
+}
+
+socket.onopen = function(event) {
+   playerCards = dealCards(3);
+  socket.send(`player-cards:${JSON.stringify(playerCards)}`);
+  displayCards(playerCards);
+}
+
+function displayCards(cards){
+  const cardContainer = document.querySelector(".card-container");
+  let cardsHTML = "";
+  cards.forEach(card => {
+    cardsHTML += `
+    <div class="card greek top" data-id="${card.id}" onclick="sendCardId(this)">
+      <img src="${card.imgSrc}" alt="${card.name}">
+    </div>
+    `;
+  });
+  cardContainer.innerHTML = cardsHTML;
+}
+    
+
+function sendCardId(card) {
+  const cardId = card.getAttribute('data-id');
+  socket.send(JSON.stringify({type:'card-selected',data:cardId}));
+}
+
+
+socket.onmessage = function(event) {
+  const message = JSON.parse(event.data);
+  if (message.type === 'player-cards') {
+    playerCards = message.data;
+    displayCards(playerCards);
+  } else if (message.type === 'card-selected') {
+    const cardId = message.data;
+    let selectedCard;
+    playerCards.forEach(cards => {
+    if (cards.id == cardId) {
+        selectedCard = cards;
+    }
+    });
+    if(selectedCard){
+       showSelectedCard(selectedCard);
+    }
+   
+  }
+};
+
+
+function showSelectedCard(selectedCard) {
+    let modal = document.getElementById("card-modal");
+  let modalImg = document.getElementById("modal-img");
+  let closeModal = document.querySelector(".close-modal");
+  console.log(selectedCard);
+  // Set the source of the modal image to the selected card's image
+  modalImg.src = selectedCard.imgSrc;
+
+  // Display the modal
+  modal.style.display = "block";
+
+  // Close the modal when the close button is clicked
+  closeModal.onclick = function() {
+    modal.style.display = "none";
+  }
+}
+
+
+    </script>
+  </body>
+</html>

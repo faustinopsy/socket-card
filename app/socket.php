@@ -6,8 +6,11 @@ use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
 
 class Socket implements MessageComponentInterface {
+    private $cardId;
+    private $cardPower;
     private $clients;
     private $vez;
+    private $targetDiv;
     public function __construct()
     {
         $this->clients = new \SplObjectStorage;
@@ -25,15 +28,16 @@ class Socket implements MessageComponentInterface {
         $data = json_decode($msg);
        
         if(isset($data->type) && $data->type == 'move-card'){
-            $cardId = $data->cardId;
-            $cardPower = $data->cardPower;
-            $this->vez = $data->jogador;
+            $this->cardId = $data->data->cardId;
+            $this->cardPower = $data->data->cardPower;
+            $this->targetDiv =$data->data->targetDiv;
+            //$this->vez = $data->jogador;
             //aqui você pode enviar essas informações para os outros clientes conectados
             foreach ( $this->clients as $client ) {
                 if ( $from->resourceId == $client->resourceId ) {
                     continue;
                 }
-                $client->send(json_encode(['type' => 'move-card', 'cardId' => $cardId, 'cardPower' => $cardPower, 'vez'=> $this->vez]));
+                $client->send(json_encode(['type' => 'move-card', 'cardId' => $this->cardId, 'cardPower' => $this->cardPower, 'targetDiv'=> $this->targetDiv]));
             }
         }else{
             //caso não seja uma mensagem de movimentação de carta, você pode tratar de forma normal

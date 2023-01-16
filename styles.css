@@ -1,0 +1,179 @@
+ /* CSS for card styling */
+ .card {
+    width: 150px;
+    height: 200px;
+    background-color: white;
+    border: 1px solid black;
+    margin: 10px;
+    padding: 10px;
+    float: left;
+  }
+  .card img {
+    width: 100%;
+  }
+  .card-row {
+display: flex;
+}
+.card-container {
+display: flex;
+flex-wrap: wrap;
+}
+
+.card-row {
+display: flex;
+}
+
+.card {
+width: 150px;
+height: 200px;
+margin: 10px;
+border: 1px solid black;
+}
+
+.top {
+opacity: 1;
+}
+
+.bottom {
+opacity: 0;
+transition: opacity 1s;
+}
+
+.bottom.flip {
+opacity: 1;
+}
+/* Style the modal container */
+.modal {
+display: none; /* Hidden by default */
+position: fixed; /* Stay in place */
+z-index: 1; /* Sit on top */
+left: 0;
+top: 0;
+width: 100%; /* Full width */
+height: 100%; /* Full height */
+overflow: auto; /* Enable scroll if needed */
+background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+/* Style the modal content */
+.modal-content {
+position: relative;
+background-color: #fefefe;
+margin: auto;
+padding: 0;
+width: 80%;
+box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+-webkit-animation-name: animatetop;
+-webkit-animation-duration: 0.4s;
+animation-name: animatetop;
+animation-duration: 0.4s;
+}
+
+/* Style the close button */
+.close-modal {
+color: white;
+float: right;
+font-size: 28px;
+font-weight: bold;
+}
+
+.close-modal:hover,
+.close-modal:focus {
+color: #000;
+text-decoration: none;
+cursor: pointer;
+}
+
+/* Add animation */
+@-webkit-keyframes animatetop {
+from {
+top: -300px;
+opacity: 0;
+}
+to {
+top: 0;
+opacity: 1;
+}
+}
+
+@keyframes animatetop {
+from {
+top: -300px;
+opacity: 0;
+}
+to {
+top: 0;
+opacity: 1;
+}
+}
+#div1 {
+width: 130px;
+height: 170px;
+padding: 10px;
+border: 1px solid #aaaaaa;
+float: left;
+display: flex;
+margin: 10px;
+border: 1px solid black;
+}
+#div2 {
+width: 130px;
+height: 170px;
+padding: 10px;
+border: 1px solid #aaaaaa;
+float: left;
+display: flex;
+margin: 10px;
+border: 1px solid black;
+}
+#div3 {
+width: 130px;
+height: 170px;
+padding: 10px;
+border: 1px solid #aaaaaa;
+float: left;
+display: flex;
+margin: 10px;
+border: 1px solid black;
+}
+.slidecontainer {
+    width: 100%;
+  }
+  
+  .slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 25px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+  }
+  
+  .slider:hover {
+    opacity: 1;
+  }
+  
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    background: #04AA6D;
+    cursor: pointer;
+  }
+  
+  .slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: #04AA6D;
+    cursor: pointer;
+  }
+  .card-defense {
+    top: 5px;
+    left: 5px;
+    background-color: white;
+    padding: 2px 5px;
+    border-radius: 5px;
+}

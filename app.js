@@ -1,4 +1,4 @@
-var socket = new WebSocket('ws://216.172.172.207:8080');
+var socket = new WebSocket('ws://localhost:8080');
 var gameContainer = document.getElementById("game-container");
 let playerCards=[];
 let vez = "";
@@ -38,9 +38,9 @@ updateRangeValue();
 
 socket.onmessage = function(event) {
     const message = JSON.parse(event.data);
-    console.log(message);
     if (message.type === 'move-card') {
         playerCards = message;
+        vez= message.playerName;
         showSelectedCard(playerCards);
         } else if (message.type === 'player-cards') {
         playerCards = message;
@@ -99,7 +99,6 @@ function shuffleDeck(deck) {
 
 function showSelectedCard(selectedCard) {
     
-    console.log(selectedCard);
     var cards = document.querySelectorAll("img");
     const divsArr = Array.from(cards)
     let total=0;
@@ -107,7 +106,6 @@ function showSelectedCard(selectedCard) {
         total=cardDeck[divsArr[0].id].defense-selectedCard.cardPower;
         cardDeck[divsArr[0].id].defense=  total;
         cards[0].setAttribute('data-defense',   total);
-        console.log(cards[0]);
         if(cardDeck[divsArr[0].id].defense<=0){
             cards[0].remove();
         }
@@ -143,7 +141,7 @@ function displayCards(cards){
           <div class="w3-container w3-center">
           <p> Força: ${card.power}   Defesa: ${card.defense}  Elemento: ${card.element}</p>
           </div>
-          <img src="${card.imgSrc}" alt="${card.name}" id="${card.id}" data-id="${card.id}" data-power="${card.power}" data-defense="${card.defense}" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ontouchstart="drag(event)" ontouchmove="touchMove(event)" ontouchend="endTouch(event)">
+          <img src="${card.imgSrc}" alt="${card.name}" id="${card.id}" data-id="${card.id}" data-power="${card.power}" data-defense="${card.defense}" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" data-turn="jogador">
           
           </div>
         `;
@@ -158,7 +156,7 @@ function displayCards(cards){
         var cardPower = cardElement.getAttribute('data-power')/cardElement.getAttribute('data-defense');
         var targetDiv = ev.target.id;
         
-        socket.send(JSON.stringify({ type: 'move-card', data: { cardId, cardPower,  targetDiv } }));
+        socket.send(JSON.stringify({ type: 'move-card', data: { cardId, cardPower,  targetDiv,playerName } }));
     }
 
     function allowDrop(ev) {
@@ -171,21 +169,24 @@ function displayCards(cards){
       }
       
       function drop(ev) {
-       
+        console.log(vez);
+        console.log(playerName);
+        if(vez===playerName){
+            alert("Não é sua vez")
+            return;
+        }
           ev.preventDefault();
           var elementId = ev.dataTransfer.getData("elementId");
           var element = document.getElementById(elementId);
           var targetDiv = ev.target.id;
           //if (vez === playerName) {
             ev.target.appendChild(element);
-          if (element && targetDiv) {
-            
-            sendCardMovement(ev);
-            
-        }
-    // } else {
-    //     alert("Não é a sua vez de jogar!");
-    // }
+            if (element && targetDiv) {
+                
+                sendCardMovement(ev);
+                vez=playerName;
+            }
+       
       }
    
 

@@ -11,6 +11,7 @@ class Socket implements MessageComponentInterface {
     private $clients;
     private $vez;
     private $targetDiv;
+    private $playerName;
     public function __construct()
     {
         $this->clients = new \SplObjectStorage;
@@ -31,13 +32,13 @@ class Socket implements MessageComponentInterface {
             $this->cardId = $data->data->cardId;
             $this->cardPower = $data->data->cardPower;
             $this->targetDiv =$data->data->targetDiv;
-            //$this->vez = $data->jogador;
+            $this->playerName = $data->data->playerName;
             //aqui você pode enviar essas informações para os outros clientes conectados
             foreach ( $this->clients as $client ) {
                 if ( $from->resourceId == $client->resourceId ) {
                     continue;
                 }
-                $client->send(json_encode(['type' => 'move-card', 'cardId' => $this->cardId, 'cardPower' => $this->cardPower, 'targetDiv'=> $this->targetDiv]));
+                $client->send(json_encode(['type' => 'move-card', 'cardId' => $this->cardId, 'cardPower' => $this->cardPower, 'targetDiv'=> $this->targetDiv,'playerName'=>$this->playerName]));
             }
         }else{
             //caso não seja uma mensagem de movimentação de carta, você pode tratar de forma normal

@@ -22,21 +22,22 @@ const cardDeck = [
 
 
 // Envia os dados de login para o servidor
-
-
 socket.onopen = function(event) {
     let jogadorNome = prompt("Insira seu nome de usuário:");
-playerName = jogadorNome;
-playerPassword = prompt("Insira sua senha:");
+    playerName = jogadorNome;
+    playerPassword = prompt("Insira sua senha:");
     socket.send(JSON.stringify({ type: 'login', data: { playerName, playerPassword } }));
-playerCards = dealCards(3);
-socket.send(`player-cards:${JSON.stringify(playerCards)}`);
-displayCards(playerCards);
-updateRangeValue();
+    playerCards = dealCards(3);
+    socket.send(`player-cards:${JSON.stringify(playerCards)}`);
+    displayCards(playerCards);
+    var nome = document.getElementById("nome");
+    nome.value=jogadorNome;
+    updateRangeValue();
 }
 
 
 socket.onmessage = function(event) {
+    //recebe as mensagens do servidor
     const message = JSON.parse(event.data);
     if (message.type === 'move-card') {
         playerCards = message;
@@ -45,20 +46,23 @@ socket.onmessage = function(event) {
         } else if (message.type === 'player-cards') {
         playerCards = message;
         displayCards(playerCards);
-        } else if (message.type === 'card-selected') {
+        } else if (message.type === 'acabou') {
+            alert(vez + 'Venceu!');
+        }
+        else if (message.type === 'card-selected') {
         const cardId = message;
         let selectedCard;
         playerCards.forEach(cards => {
-        if (cards.id == cardId) {
-        selectedCard = cards;
-    }
-    updateRangeValue();
-});
-if(selectedCard){
- showSelectedCard(selectedCard);
-}
+            if (cards.id == cardId) {
+            selectedCard = cards;
+            }
+        updateRangeValue();
+        });
+        if(selectedCard){
+        showSelectedCard(selectedCard);
+        }
 
-}
+        }
 };
 
 // const cardImages = document.querySelectorAll("img[data-defense]");
@@ -70,35 +74,45 @@ if(selectedCard){
 // });
 // document.getElementById("myRange").value = totalDefense;
 // console.log(totalDefense);
+var totalDefense = 0;
 function updateRangeValue() {
+    //atualiza os pontos de vida global
     var range = document.getElementById("myRange");
     var cards = document.querySelectorAll("img");
+    var vida = document.getElementById("vida");
+   
     var totalDefense = 0;
     cards.forEach(card => {
         totalDefense += parseInt(card.dataset.defense);
     });
     range.value = totalDefense;
+    vida.value= totalDefense;
+    if (totalDefense === 0) {
+        socket.send(JSON.stringify({ type: 'acabou', data: { playerName, 'perdeu':'perdeu!' } }));
+    }
 }
 
-function sendCardId(card) {
-const cardId = card.getAttribute('data-id');
-socket.send(JSON.stringify({type:'card-selected',data:cardId}));
+// function sendCardId(card) {
+//     const cardId = card.getAttribute('data-id');
+//     socket.send(JSON.stringify({type:'card-selected',data:cardId}));
+// }
+
+    
+function dealCards(numCards) {
+    const shuffledDeck = shuffleDeck(cardDeck);
+    return shuffledDeck.slice(0, numCards);
 }
 function shuffleDeck(deck) {
+    //embalhara as cartas
     for (let i = deck.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [deck[i], deck[j]] = [deck[j], deck[i]];
     }
     return deck;
-    }
-    
-    function dealCards(numCards) {
-    const shuffledDeck = shuffleDeck(cardDeck);
-    return shuffledDeck.slice(0, numCards);
-    }
+}
 
 function showSelectedCard(selectedCard) {
-    
+    // recebe o movimento do oponente
     var cards = document.querySelectorAll("img");
     const divsArr = Array.from(cards)
     let total=0;
@@ -126,8 +140,6 @@ function showSelectedCard(selectedCard) {
             cards[2].remove();
         }
     }
-
-
     updateRangeValue()
 }
 
@@ -141,53 +153,85 @@ function displayCards(cards){
           <div class="w3-container w3-center">
           <p> Força: ${card.power}   Defesa: ${card.defense}  Elemento: ${card.element}</p>
           </div>
-          <img src="${card.imgSrc}" alt="${card.name}" id="${card.id}" data-id="${card.id}" data-power="${card.power}" data-defense="${card.defense}" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" data-turn="jogador">
+          <img src="${card.imgSrc}" alt="${card.name}" id="${card.id}" data-id="${card.id}" data-power="${card.power}" data-defense="${card.defense}"
+           draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" data-turn="jogador"
+           style="width: 150px;height: 200px;">
           
           </div>
         `;
       });
     cardContainer.innerHTML = cardsHTML;
+}
+function sendCardMovement(ev) {
+    // quando a carta é movimentada, divide o poder pela defesa e envia o ataque
+    var elementId = ev.dataTransfer.getData("elementId");
+    var cardElement = document.getElementById(elementId);
+    var cardId = cardElement.getAttribute('data-id');
+    var cardPower = cardElement.getAttribute('data-power')/cardElement.getAttribute('data-defense');
+    var targetDiv = ev.target.id;
+
+    socket.send(JSON.stringify({ type: 'move-card', data: { cardId, cardPower,  targetDiv,playerName } }));
+}
+
+function doObjectsCollide(obj1, obj2) {
+    var obj1Rect = obj1.getBoundingClientRect();
+    var obj2Rect = obj2.getBoundingClientRect();
+    return !(obj1Rect.top > obj2Rect.bottom || 
+             obj1Rect.right < obj2Rect.left || 
+             obj1Rect.bottom < obj2Rect.top || 
+             obj1Rect.left > obj2Rect.right)
+}
+
+function checkCollision(image) {
+    console.log(image)
+    var images = document.getElementsByTagName("img");
+    const divsArr = Array.from(images)
+    
+    for (var i = 0; i < images.length; i++) {
+        if (doObjectsCollide(image, images[i]) && image.parentNode === images[i].parentNode && images[i].parentNode !== null) {
+            // Calcular novos valores de ataque e defesa
+            if(parseInt(image.getAttribute('data-power'))<100 || parseInt(images[i].getAttribute('data-power'))<100){
+            var newAttack =  parseInt(image.getAttribute('data-power'))+parseInt(images[i].getAttribute('data-power'));
+            var newDefense = parseInt(image.getAttribute('data-defense'))+parseInt(images[i].getAttribute('data-defense'));
+            // Atualizar valores de ataque e defesa na imagem
+            images[i].setAttribute('data-power', newAttack);
+            images[i].setAttribute('data-defense', newDefense);
+            }
+            // Remover imagem colidida
+            //image.remove();
+        }
     }
-    function sendCardMovement(ev) {
-        
-        var elementId = ev.dataTransfer.getData("elementId");
-        var cardElement = document.getElementById(elementId);
-        var cardId = cardElement.getAttribute('data-id');
-        var cardPower = cardElement.getAttribute('data-power')/cardElement.getAttribute('data-defense');
-        var targetDiv = ev.target.id;
-        
-        socket.send(JSON.stringify({ type: 'move-card', data: { cardId, cardPower,  targetDiv,playerName } }));
+}
+
+// os eventos arrastar e soltar
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+function drag(ev) {
+    ev.dataTransfer.setData("elementId", ev.target.id);
+
+}
+
+function drop(ev) {
+    if(vez===playerName){
+        alert("Não é sua vez")
+        return;
+    }
+    
+    ev.preventDefault();
+    var elementId = ev.dataTransfer.getData("elementId");
+    var element = document.getElementById(elementId);
+    var targetDiv = ev.target.id;
+    //if (vez === playerName) {
+    ev.target.appendChild(element);
+    
+    if (element && targetDiv) {
+        checkCollision(element);
+        sendCardMovement(ev);
+        vez=playerName;
     }
 
-    function allowDrop(ev) {
-        ev.preventDefault();
-      }
-      
-      function drag(ev) {
-        ev.dataTransfer.setData("elementId", ev.target.id);
-        
-      }
-      
-      function drop(ev) {
-        console.log(vez);
-        console.log(playerName);
-        if(vez===playerName){
-            alert("Não é sua vez")
-            return;
-        }
-          ev.preventDefault();
-          var elementId = ev.dataTransfer.getData("elementId");
-          var element = document.getElementById(elementId);
-          var targetDiv = ev.target.id;
-          //if (vez === playerName) {
-            ev.target.appendChild(element);
-            if (element && targetDiv) {
-                
-                sendCardMovement(ev);
-                vez=playerName;
-            }
-       
-      }
+}
    
 
       

@@ -167,7 +167,7 @@ function sendCardMovement(ev) {
     var elementId = ev.dataTransfer.getData("elementId");
     var cardElement = document.getElementById(elementId);
     var cardId = cardElement.getAttribute('data-id');
-    var cardPower = cardElement.getAttribute('data-power')/cardElement.getAttribute('data-defense');
+    var cardPower = cardElement.getAttribute('data-power')/cardElement.getAttribute('data-defense')+0.66;
     var targetDiv = ev.target.id;
 
     socket.send(JSON.stringify({ type: 'move-card', data: { cardId, cardPower,  targetDiv,playerName } }));

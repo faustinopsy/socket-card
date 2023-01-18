@@ -1,6 +1,6 @@
  /* CSS for card styling */
  .card {
-    width: 150px;
+    width: 130px;
     height: 200px;
     background-color: white;
     border: 1px solid black;
@@ -24,7 +24,7 @@ display: flex;
 }
 
 .card {
-width: 150px;
+width: 130px;
 height: 200px;
 margin: 10px;
 border: 1px solid black;
@@ -108,7 +108,7 @@ opacity: 1;
 }
 #div1 {
 width: 130px;
-height: 170px;
+height: 200px;
 padding: 10px;
 border: 1px solid #aaaaaa;
 float: left;
@@ -118,7 +118,7 @@ border: 1px solid black;
 }
 #div2 {
 width: 130px;
-height: 170px;
+height: 200px;
 padding: 10px;
 border: 1px solid #aaaaaa;
 float: left;
@@ -128,7 +128,7 @@ border: 1px solid black;
 }
 #div3 {
 width: 130px;
-height: 170px;
+height: 200px;
 padding: 10px;
 border: 1px solid #aaaaaa;
 float: left;

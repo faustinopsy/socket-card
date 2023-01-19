@@ -3,6 +3,7 @@ var gameContainer = document.getElementById("game-container");
 let playerCards=[];
 let vez = "";
 let playerName, playerPassword;
+let sala;
 const cardDeck = [
 { id: 1, imgSrc: 'img/god1.png', name: 'Zoom', power: 50, defense: 30,  element: 'Fumaça',  classe: 'sombra' },
 { id: 2, imgSrc: 'img/god2.png', name: 'Portal', power: 50, defense: 29,  element: 'Portal',  classe: 'alien' },
@@ -26,45 +27,90 @@ socket.onopen = function(event) {
     let jogadorNome = prompt("Insira seu nome de usuário:");
     playerName = jogadorNome;
     playerPassword = prompt("Insira sua senha:");
-    socket.send(JSON.stringify({ type: 'login', data: { playerName, playerPassword } }));
+    // Adicionado código para escolher criar ou entrar em uma sala
+    let choice = prompt("Digite 'criar' para criar uma nova sala ou 'entrar' para entrar em uma sala existente:");
+    if (choice === 'criar') {
+    socket.send(JSON.stringify({ type: 'create-room', data: { playerName, playerPassword } }));
+    } else {
+    let roomId = prompt("Insira o ID da sala que você deseja entrar:");
+    sala=roomId;
+    socket.send(JSON.stringify({ type: 'join-room', data: { playerName, playerPassword, 'roomId': roomId } }));
+    }
+   
     playerCards = dealCards(3);
-    socket.send(`player-cards:${JSON.stringify(playerCards)}`);
+    socket.send(JSON.stringify({ type: 'player-cards', data: playerCards }));
     displayCards(playerCards);
     var nome = document.getElementById("nome");
     nome.value=jogadorNome;
     updateRangeValue();
-}
-
-
-socket.onmessage = function(event) {
+    }
+    
+   
+    
+    socket.onmessage = function(event) {
     //recebe as mensagens do servidor
     const message = JSON.parse(event.data);
+    console.log(message);
     if (message.type === 'move-card') {
-        playerCards = message;
-        vez= message.playerName;
-        showSelectedCard(playerCards);
-        } else if (message.type === 'player-cards') {
-        playerCards = message;
-        displayCards(playerCards);
-        } else if (message.type === 'acabou') {
-            alert(vez + 'Venceu!');
-        }
-        else if (message.type === 'card-selected') {
-        const cardId = message;
-        let selectedCard;
-        playerCards.forEach(cards => {
-            if (cards.id == cardId) {
-            selectedCard = cards;
-            }
-        updateRangeValue();
-        });
-        if(selectedCard){
-        showSelectedCard(selectedCard);
-        }
+    playerCards = message.data;
+    vez= message.data.playerName;
+    showSelectedCard(playerCards);
+    } else if (message.type === 'create-room') {
+        sala=message.data.roomId;
+        var salaid = document.getElementById("sala");
+        salaid.value=sala;
+    }else if (message.type === 'join-room') {
+    // Verifica se a sala corresponde à sala do jogador atual
+    if (message.data.roomId !== sala) {
 
-        }
-};
+    return;
+    }
+    }
+    else if (message.type === 'player-cards') {
+    playerCards = message.data;
+    displayCards(playerCards);
+    } else if (message.type === 'acabou') {
+    alert(vez + 'Venceu!');
+    }
+    else if (message.type === 'card-selected') {
+    const cardId = message.data;
+    let selectedCard;
+    playerCards.forEach(cards => {
+    if (cards.id == cardId) {
+    selectedCard = cards;
+    }
+    alert("Sua vez")
+    updateRangeValue();
+    });
+    if(selectedCard){
+    showSelectedCard(selectedCard);
+    }
+ 
+    }
+    };
+// function to create a room
+function createRoom() {
+    playerName = document.getElementById("playerName").value;
+    playerPassword = document.getElementById("playerPassword").value;
+    socket.send(JSON.stringify({
+        type: 'create-room',
+        playerName: playerName,
+        playerPassword: playerPassword
+    }));
+}
 
+// function to join a room
+function joinRoom() {
+    roomId = document.getElementById("roomId").value;
+    playerPassword = document.getElementById("playerPassword").value;
+    socket.send(JSON.stringify({
+        type: 'join-room',
+        data: {
+            roomId: roomId,
+            playerPassword: playerPassword
+        }
+    }));
+}
 // const cardImages = document.querySelectorAll("img[data-defense]");
 // let totalDefense = 0;
 // console.log(cardImages);
@@ -151,7 +197,6 @@ function displayCards(cards){
         cardsHTML += `
           <div class="card greek top w3-card-4" data-id="${card.id}" data-defense="${card.defense}" ondrop="drop(event)" ondragover="allowDrop(event)" >
           <div class="w3-container w3-center">
-          <p> Força: ${card.power}   Defesa: ${card.defense}  Elemento: ${card.element}</p>
           </div>
           <img src="${card.imgSrc}" alt="${card.name}" id="${card.id}" data-id="${card.id}" data-power="${card.power}" data-defense="${card.defense}"
            draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" data-turn="jogador"
@@ -170,7 +215,7 @@ function sendCardMovement(ev) {
     var cardPower = cardElement.getAttribute('data-power')/cardElement.getAttribute('data-defense')+0.66;
     var targetDiv = ev.target.id;
 
-    socket.send(JSON.stringify({ type: 'move-card', data: { cardId, cardPower,  targetDiv,playerName } }));
+    socket.send(JSON.stringify({ type: 'move-card', data: { cardId, cardPower,  targetDiv, playerName } }));
 }
 
 function doObjectsCollide(obj1, obj2) {
@@ -214,7 +259,8 @@ function drag(ev) {
 
 function drop(ev) {
     if(vez===playerName){
-        alert("Não é sua vez")
+        //alert("Não é sua vez")
+        notificar();
         return;
     }
     
@@ -232,6 +278,38 @@ function drop(ev) {
     }
 
 }
+var notyclick = false;
+    function notifyMe(title, body,thread,token) {
+
+        if (Notification.permission !== 'granted') {
+            Notification.requestPermission();
+        } else {
+            var notification = new Notification(title, {
+                icon: '',
+                body: body,
+            });
+            
+            notification.onclick = function() {
+               //window.open('https://chat.saferegistercar.com.br/chat/index.php/chat/'+thread+'/'+token);
+                //Mibew.ChatPopup.init({"id":"63b6cf7d359408e4","url":"https://chat.saferegistercar.com.br/chat/index.php/chat/"+thread+"/"+token,"preferIFrame":true})
+                Mibew.Objects.ChatPopups['63b6cf7d359408e4'].open();return false;
+            };
+            
+        }
+    }
+    function notificar()
+    {
+        setTimeout(function() {
+                       if (notyclick==false) {
+                        notifyMe('Atenção', 'Não é sua vez','22');
+                        notyclick=true;
+                    }
+            //});
+            notificar();
+            
+      }, 3000);
+    }
+    notificar();
    
 
       

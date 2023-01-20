@@ -38,14 +38,23 @@ class Socket implements MessageComponentInterface {
         } elseif (isset($data->type) && $data->type == 'join-room') {
             // Adiciona o jogador a uma sala existente
             $roomId = $data->data->roomId;
-            if (isset($this->rooms[$roomId]) && count($this->rooms[$roomId]) < 2) {
-                $this->rooms[$roomId][] = $from;
-                $from->send(json_encode(['type' => 'join-room', 'roomId' => $roomId]));
-    
-                foreach ($this->rooms[$roomId] as $client) {
-                    if ($client !== $from) {
-                        $client->send(json_encode(['type' => 'player-joined', 'playerName' => $data->data->playerName]));
+            if (isset($data->type) && $data->type == 'join-room') {
+                // Adiciona o jogador a uma sala existente
+                $roomId = $data->data->roomId;
+                if (isset($this->rooms[$roomId]) && count($this->rooms[$roomId]) < 2) {
+                    // if(/*Verificação de autenticação aqui*/){
+                    //     $this->rooms[$roomId][] = $from;
+                    //     $from->send(json_encode(['type' => 'join-room', 'roomId' => $roomId]));
+                    // }else{
+                    //     $from->send(json_encode(['type' => 'error', 'message' => 'Usuário não autenticado']));
+                    // }
+                    foreach ($this->rooms[$roomId] as $client) {
+                        if ($client !== $from) {
+                            $client->send(json_encode(['type' => 'player-joined', 'playerName' => $data->data->playerName]));
+                        }
                     }
+                } else {
+                    $from->send(json_encode(['type' => 'error', 'message' => 'Sala cheia ou não existe']));
                 }
             } else {
                 $from->send(json_encode(['type' => 'error', 'message' => 'Sala cheia ou não existe']));

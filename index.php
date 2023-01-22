@@ -26,6 +26,7 @@
             </div>
           </div>
           
-    <script src="app.js"></script>
+    <script src="server.js"></script>
+    <script src="client.js"></script>
   </body>
 </html>

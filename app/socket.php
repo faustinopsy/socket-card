@@ -27,59 +27,55 @@ class Socket implements MessageComponentInterface {
         echo "New connection! ({$conn->resourceId})\n";
     }
    
-    public function onMessage(ConnectionInterface $from, $msg) {
-        $data = json_decode($msg);
-        var_dump($data);
-    
-        if (isset($data->type) && $data->type == 'create-room') {
-            $roomId = uniqid();
-            $this->rooms[$roomId] = [$from];
-            $from->send(json_encode(['type' => 'create-room', 'roomId' => $roomId]));
-        } elseif (isset($data->type) && $data->type == 'join-room') {
-            // Adiciona o jogador a uma sala existente
-            $roomId = $data->data->roomId;
-            if (isset($data->type) && $data->type == 'join-room') {
-                // Adiciona o jogador a uma sala existente
+        public function onMessage(ConnectionInterface $from, $msg) {
+            $data = json_decode($msg);
+            var_dump($data);
+            if (isset($data->type) && $data->type == 'create-room') {
+                $roomId = uniqid();
+                $this->rooms[$roomId] = [$from];
+                $from->send(json_encode(['type' => 'create-room', 'roomId' => $roomId,'playerName'=>$data->playerName]));
+                var_dump($this->rooms);
+            } 
+            elseif (isset($data->type) && $data->type == 'join-room') 
+            {
                 $roomId = $data->data->roomId;
-                if (isset($this->rooms[$roomId]) && count($this->rooms[$roomId]) < 2) {
-                    // if(/*Verificação de autenticação aqui*/){
-                    //     $this->rooms[$roomId][] = $from;
-                    //     $from->send(json_encode(['type' => 'join-room', 'roomId' => $roomId]));
-                    // }else{
-                    //     $from->send(json_encode(['type' => 'error', 'message' => 'Usuário não autenticado']));
-                    // }
-                    foreach ($this->rooms[$roomId] as $client) {
+                if (!isset($this->rooms[$roomId]) || count($this->rooms[$roomId]) >= 2) {
+                    $from->send(json_encode(['type' => 'cheia', 'mensagem' => 'A sala já esta cheia']));
+                    return;
+                }
+                $this->rooms[$roomId][] = $from;
+                $from->send(json_encode(['type' => 'join-room', 'roomId' => $roomId]));
+                foreach ($this->rooms[$roomId] as $client) {
                         if ($client !== $from) {
-                            $client->send(json_encode(['type' => 'player-joined', 'playerName' => $data->data->playerName]));
+                        $client->send(json_encode(['type' => 'player-joined', 'playerName' => $data->data->playerName]));
+                        }
+                        else {
+                            $client->send(json_encode(['type' => 'cheia', 'mensagem' => 'A sala já esta cheia']));
                         }
                     }
-                } else {
-                    $from->send(json_encode(['type' => 'error', 'message' => 'Sala cheia ou não existe']));
+                
+            }
+            elseif (isset($data->type) && $data->type == 'move-card') {
+                $this->cardId = $data->data->cardId;
+                $this->cardPower = $data->data->cardPower;
+                $this->targetDiv = $data->data->targetDiv;
+                $this->playerName = $data->data->playerName;
+                //aqui você pode enviar essas informações para os outros clientes conectados
+                foreach ($this->clients as $client) {
+                    if ($from->resourceId == $client->resourceId) {
+                        continue;
+                    }
+                    $client->send(json_encode(['type' => 'move-card', 'cardId' => $this->cardId, 'cardPower' => $this->cardPower, 'targetDiv' => $this->targetDiv, 'playerName' => $this->playerName]));
                 }
             } else {
-                $from->send(json_encode(['type' => 'error', 'message' => 'Sala cheia ou não existe']));
-            }
-        } elseif (isset($data->type) && $data->type == 'move-card') {
-            $this->cardId = $data->data->cardId;
-            $this->cardPower = $data->data->cardPower;
-            $this->targetDiv = $data->data->targetDiv;
-            $this->playerName = $data->data->playerName;
-            //aqui você pode enviar essas informações para os outros clientes conectados
-            foreach ($this->clients as $client) {
-                if ($from->resourceId == $client->resourceId) {
-                    continue;
+                //caso não seja uma mensagem de movimentação de carta, você pode tratar de forma normal
+                foreach ($this->clients as $client) {
+                    if ($from->resourceId == $client->resourceId) {
+                        continue;
+                    }
+                    $client->send($msg);
                 }
-                $client->send(json_encode(['type' => 'move-card', 'cardId' => $this->cardId, 'cardPower' => $this->cardPower, 'targetDiv' => $this->targetDiv, 'playerName' => $this->playerName]));
             }
-        } else {
-            //caso não seja uma mensagem de movimentação de carta, você pode tratar de forma normal
-            foreach ($this->clients as $client) {
-                if ($from->resourceId == $client->resourceId) {
-                    continue;
-                }
-                $client->send($msg);
-            }
-        }
     }
     
     public function onClose(ConnectionInterface $conn) {

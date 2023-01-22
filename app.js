@@ -120,26 +120,33 @@ function showSelectedCard(selectedCard) {
         total=cardDeck[divsArr[0].id].defense-selectedCard.cardPower;
         cardDeck[divsArr[0].id].defense=  total;
         cards[0].setAttribute('data-defense',   total);
+        cards[0].setAttribute("class", "w3-animate-zoom");
         if(cardDeck[divsArr[0].id].defense<=0){
             cards[0].remove();
         }
+        cards[0].removeAttribute("class");
     }
     else if(selectedCard.targetDiv=='div2'){
         total=cardDeck[divsArr[1].id].defense-selectedCard.cardPower;
         cardDeck[divsArr[1].id].defense=  total;
         cards[1].setAttribute('data-defense',   total);
+        cards[1].setAttribute("class", "w3-animate-zoom");
         if(cardDeck[divsArr[1].id].defense<=0){
             cards[1].remove();
         }
+        cards[1].removeAttribute("class");
     }
     if(selectedCard.targetDiv=='div3'){
         total=cardDeck[divsArr[2].id].defense-selectedCard.cardPower;
         cardDeck[divsArr[2].id].defense=  total;
         cards[2].setAttribute('data-defense', total);
+        cards[2].setAttribute("class", "w3-animate-zoom");
         if(cardDeck[divsArr[2].id].defense<=0){
             cards[2].remove();
         }
+        cards[2].removeAttribute("class");
     }
+    sim()
     updateRangeValue()
 }
 
@@ -150,12 +157,9 @@ function displayCards(cards){
     cards.forEach(card => {
         cardsHTML += `
           <div class="card greek top w3-card-4" data-id="${card.id}" data-defense="${card.defense}" ondrop="drop(event)" ondragover="allowDrop(event)" >
-          <div class="w3-container w3-center">
-          <p> Força: ${card.power}   Defesa: ${card.defense}  Elemento: ${card.element}</p>
-          </div>
           <img src="${card.imgSrc}" alt="${card.name}" id="${card.id}" data-id="${card.id}" data-power="${card.power}" data-defense="${card.defense}"
            draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" data-turn="jogador"
-           style="width: 150px;height: 200px;">
+           style="width: 130px;height: 200px;">
           
           </div>
         `;
@@ -214,7 +218,7 @@ function drag(ev) {
 
 function drop(ev) {
     if(vez===playerName){
-        alert("Não é sua vez")
+        nao()
         return;
     }
     
@@ -233,5 +237,38 @@ function drop(ev) {
 
 }
    
+// Get the modal
+var modal = document.getElementById("myModal1");
+var modal2 = document.getElementById("myModal2");
+// Get the button that opens the modal
+var btn = document.getElementById("myBtn");
 
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the button, open the modal 
+function  nao() {
+    modal2.style.display = "none";
+    modal.style.display = "block";
+    
+}
+function  sim() {
+    modal.style.display = "none";
+    modal2.style.display = "block";
+}
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+    modal2.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+if (event.target == modal) {
+    modal.style.display = "none";
+}
+if (event.target == modal2) {
+    modal2.style.display = "none";
+}
+}
       

@@ -4,26 +4,51 @@ let playerCards=[];
 let vez = "";
 let playerName, playerPassword;
 const cardDeck = [
-{ id: 1, imgSrc: 'img/god1.png', name: 'Zoom', power: 50, defense: 30,  element: 'Fumaça',  classe: 'sombra' },
-{ id: 2, imgSrc: 'img/god2.png', name: 'Portal', power: 50, defense: 29,  element: 'Portal',  classe: 'alien' },
-{ id: 3, imgSrc: 'img/god3.png', name: 'Acido', power: 50, defense: 27,  element: 'Acido',  classe: 'alien' },
-{ id: 4, imgSrc: 'img/god4.png', name: 'Larva', power: 50, defense: 28,  element: 'Larva',  classe: 'elementos' },
-{ id: 5, imgSrc: 'img/god5.png', name: 'Furação', power: 50, defense: 26,  element: 'Furação',  classe: 'elementos' },
-{ id: 6, imgSrc: 'img/god6.png', name: 'Gelo', power: 50, defense: 29,  element: 'Gelo',  classe: 'elementos' },
-{ id: 7, imgSrc: 'img/god7.png', name: 'Pedra', power: 50, defense: 28,  element: 'Pedra',  classe: 'elementos' },
-{ id: 8, imgSrc: 'img/god8.png', name: 'Fogo', power: 50, defense: 27,  element: 'Fogo',  classe: 'elementos' },
-{ id: 9, imgSrc: 'img/god9.png', name: 'Areia', power: 50, defense: 27,  element: 'Areia',  classe: 'elementos' },
-{ id: 10, imgSrc: 'img/god10.png', name: 'Hibrido', power: 50, defense: 27,  element: 'Hibrido',  classe: 'alien' },
-{ id: 11, imgSrc: 'img/god11.png', name: 'Agua', power: 50, defense: 27,  element: 'Agua',  classe: 'elementos' },
-{ id: 12, imgSrc: 'img/god12.png', name: 'Mente', power: 50, defense: 27,  element: 'Mente',  classe: 'mago' },
-{ id: 13, imgSrc: 'img/god13.png', name: 'Guerreiro', power: 50, defense: 27,  element: 'Guerreiro',  classe: 'guerreiro' },
+{ id: 1, imgSrc: 'img/god1.png', name: 'Zoom', power: 96, defense: 76,  element: 'Fumaça',  classe: 'sombra' },
+{ id: 2, imgSrc: 'img/god2.png', name: 'Flash', power: 99, defense: 90,  element: 'Portal',  classe: 'alien' },
+{ id: 3, imgSrc: 'img/god3.png', name: 'Sombra', power: 97, defense: 88,  element: 'Acido',  classe: 'alien' },
+{ id: 4, imgSrc: 'img/god4.png', name: 'Ultron', power: 90, defense: 88,  element: 'Larva',  classe: 'elementos' },
+{ id: 5, imgSrc: 'img/god5.png', name: 'Kratos', power: 80, defense: 68,  element: 'Furação',  classe: 'elementos' },
+{ id: 6, imgSrc: 'img/god6.png', name: 'GeloX', power: 90, defense: 88,  element: 'Gelo',  classe: 'elementos' },
+{ id: 7, imgSrc: 'img/god7.png', name: 'Pedra Pyetra', power: 97, defense: 88,  element: 'Pedra',  classe: 'elementos' },
+{ id: 8, imgSrc: 'img/god8.png', name: 'Fogo Branco', power: 88, defense: 88,  element: 'Fogo',  classe: 'elementos' },
+{ id: 9, imgSrc: 'img/god9.png', name: 'Andromeda', power: 82, defense: 80,  element: 'Areia',  classe: 'elementos' },
+{ id: 10, imgSrc: 'img/god10.png', name: 'Red Jhon', power: 92, defense: 80,  element: 'Hibrido',  classe: 'alien' },
+{ id: 11, imgSrc: 'img/god11.png', name: 'Ametista', power: 99, defense: 90,  element: 'Agua',  classe: 'elementos' },
+{ id: 12, imgSrc: 'img/god12.png', name: 'Julia', power: 99, defense: 99,  element: 'Mente',  classe: 'mago' },
+{ id: 13, imgSrc: 'img/god13.png', name: 'Constantine MX', power: 99, defense: 96,  element: 'Guerreiro',  classe: 'guerreiro' },
+{ id: 14, imgSrc: 'img/god14.png', name: 'Xou', power: 89, defense: 76,  element: 'Fumaça',  classe: 'sombra' },
+{ id: 15, imgSrc: 'img/god15.png', name: 'MX Flash', power: 96, defense: 86,  element: 'Portal',  classe: 'alien' },
+{ id: 16, imgSrc: 'img/god16.png', name: 'Rubia', power: 95, defense: 57,  element: 'Acido',  classe: 'alien' },
+{ id: 17, imgSrc: 'img/god17.png', name: 'Lucisa', power: 99, defense: 99,  element: 'Larva',  classe: 'elementos' },
+{ id: 18, imgSrc: 'img/god18.png', name: 'Pantera Rocha', power: 99, defense: 96,  element: 'Furação',  classe: 'elementos' },
+{ id: 19, imgSrc: 'img/god19.png', name: 'Gelo', power: 89, defense: 76,  element: 'Gelo',  classe: 'elementos' },
+{ id: 20, imgSrc: 'img/god20.png', name: 'Pedra', power: 89, defense: 76,  element: 'Pedra',  classe: 'elementos' },
+{ id: 21, imgSrc: 'img/god21.png', name: 'Fogo', power: 96, defense: 86,  element: 'Fogo',  classe: 'elementos' },
+{ id: 22, imgSrc: 'img/god22.png', name: 'Areia', power: 120, defense: 100,  element: 'Areia',  classe: 'elementos' },
+{ id: 23, imgSrc: 'img/god23.png', name: 'Hibrido', power: 93, defense: 73,  element: 'Hibrido',  classe: 'alien' },
+{ id: 24, imgSrc: 'img/god24.png', name: 'Liquido', power: 97, defense: 73,  element: 'Agua',  classe: 'elementos' },
+{ id: 25, imgSrc: 'img/god25.png', name: 'Mente', power: 97, defense: 73,  element: 'Mente',  classe: 'mago' },
+{ id: 26, imgSrc: 'img/god26.png', name: 'Guerreiro', power: 90, defense: 67,  element: 'Guerreiro',  classe: 'guerreiro' },
+{ id: 27, imgSrc: 'img/god27.png', name: 'Zoom', power: 78, defense: 68,  element: 'Fumaça',  classe: 'sombra' },
+{ id: 28, imgSrc: 'img/god28.png', name: 'Portal', power: 88, defense: 68,  element: 'Portal',  classe: 'alien' },
+{ id: 29, imgSrc: 'img/god29.png', name: 'Acido', power: 98, defense: 88,  element: 'Acido',  classe: 'alien' },
+{ id: 30, imgSrc: 'img/god30.png', name: 'Larva', power: 98, defense: 88,  element: 'Larva',  classe: 'elementos' },
+{ id: 31, imgSrc: 'img/god31.png', name: 'Furação', power: 98, defense: 88,  element: 'wing',  classe: 'elementos' },
+{ id: 32, imgSrc: 'img/god32.png', name: 'Gelo Azul', power: 84, defense: 54,  element: 'plant',  classe: 'elementos' },
+{ id: 33, imgSrc: 'img/god33.png', name: 'Pedra', power: 84, defense: 54,  element: 'plant',  classe: 'elementos' },
+{ id: 34, imgSrc: 'img/god34.png', name: 'Fogo rosa', power: 84, defense: 77,  element: 'plant',  classe: 'elementos' },
+{ id: 35, imgSrc: 'img/god35.png', name: 'Areia', power: 89, defense: 83,  element: 'Areia',  classe: 'elementos' },
+{ id: 36, imgSrc: 'img/god36.png', name: 'Hibrido', power: 79, defense: 63,  element: 'Hibrido',  classe: 'alien' },
+{ id: 37, imgSrc: 'img/god37.png', name: 'Agua', power: 91, defense: 77,  element: 'Gelo',  classe: 'elementos' },
+{ id: 38, imgSrc: 'img/god38.png', name: 'Mente', power: 99, defense: 37,  element: 'Mente',  classe: 'human' },
 ];
 
 
 
 // Envia os dados de login para o servidor
 socket.onopen = function(event) {
-    let jogadorNome = prompt("Insira seu nome de usuário:");
+    let jogadorNome = prompt("Insira seu nome de usuário:", cardDeck[Math.floor(Math.random() * 39)].name);
     playerName = jogadorNome;
     playerPassword = prompt("Insira sua senha:");
     socket.send(JSON.stringify({ type: 'login', data: { playerName, playerPassword } }));
@@ -47,7 +72,7 @@ socket.onmessage = function(event) {
         playerCards = message;
         displayCards(playerCards);
         } else if (message.type === 'acabou') {
-            alert(vez + 'Venceu!');
+            venceu();
         }
         else if (message.type === 'card-selected') {
         const cardId = message;
@@ -89,6 +114,9 @@ function updateRangeValue() {
     vida.value= totalDefense;
     if (totalDefense === 0) {
         socket.send(JSON.stringify({ type: 'acabou', data: { playerName, 'perdeu':'perdeu!' } }));
+        perdeu();
+    }else{
+        sim()
     }
 }
 
@@ -116,6 +144,9 @@ function showSelectedCard(selectedCard) {
     var cards = document.querySelectorAll("img");
     const divsArr = Array.from(cards)
     let total=0;
+    for(var i=0;i<cards.length;i++){
+        cards[i].removeAttribute("class");
+    }
     if(selectedCard.targetDiv=='div1'){
         total=cardDeck[divsArr[0].id].defense-selectedCard.cardPower;
         cardDeck[divsArr[0].id].defense=  total;
@@ -124,7 +155,6 @@ function showSelectedCard(selectedCard) {
         if(cardDeck[divsArr[0].id].defense<=0){
             cards[0].remove();
         }
-        cards[0].removeAttribute("class");
     }
     else if(selectedCard.targetDiv=='div2'){
         total=cardDeck[divsArr[1].id].defense-selectedCard.cardPower;
@@ -134,7 +164,6 @@ function showSelectedCard(selectedCard) {
         if(cardDeck[divsArr[1].id].defense<=0){
             cards[1].remove();
         }
-        cards[1].removeAttribute("class");
     }
     if(selectedCard.targetDiv=='div3'){
         total=cardDeck[divsArr[2].id].defense-selectedCard.cardPower;
@@ -144,9 +173,8 @@ function showSelectedCard(selectedCard) {
         if(cardDeck[divsArr[2].id].defense<=0){
             cards[2].remove();
         }
-        cards[2].removeAttribute("class");
     }
-    sim()
+    
     updateRangeValue()
 }
 
@@ -240,6 +268,8 @@ function drop(ev) {
 // Get the modal
 var modal = document.getElementById("myModal1");
 var modal2 = document.getElementById("myModal2");
+var modal3 = document.getElementById("myModal3");
+var modal4 = document.getElementById("myModal4");
 // Get the button that opens the modal
 var btn = document.getElementById("myBtn");
 
@@ -255,6 +285,12 @@ function  nao() {
 function  sim() {
     modal.style.display = "none";
     modal2.style.display = "block";
+}
+function  venceu() {
+    modal4.style.display = "block";
+}
+function  perdeu() {
+    modal3.style.display = "block";
 }
 // When the user clicks on <span> (x), close the modal
 span.onclick = function() {

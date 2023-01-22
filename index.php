@@ -36,6 +36,20 @@
               
             </div>
           </div>
+          <div id="myModal3" class="modal" >
+            <div class="modal-content w3-container w3-center">
+            <h2>Você perdeu <span class="close">&times;</span></h2>
+              
+              
+            </div>
+          </div>
+          <div id="myModal4" class="modal" >
+            <div class="modal-content w3-container w3-center">
+            <h2>Você venceu <span class="close">&times;</span></h2>
+              
+              
+            </div>
+          </div>
           
     <script src="app.js"></script>
   </body>
